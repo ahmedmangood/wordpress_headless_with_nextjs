@@ -17,6 +17,9 @@ import {
 import { Section, Container } from "@/components/craft";
 import PostCard from "@/components/posts/post-card";
 import FilterPosts from "./filter";
+import { GET_ALL_POSTS } from "@/lib/wordpressQueries";
+import { usePathname } from "@/i18n/navigation";
+import { getLocale } from "next-intl/server";
 
 export default async function Page({
   searchParams,
@@ -24,16 +27,18 @@ export default async function Page({
   searchParams: { [key: string]: string | undefined };
 }) {
   const { author, tag, category, page: pageParam } = searchParams;
-  const posts = await getAllPosts({ author, tag, category });
+  // const posts = await getAllPosts({ author, tag, category });
+  const newposts = await GET_ALL_POSTS();
+
   const authors = await getAllAuthors();
   const tags = await getAllTags();
   const categories = await getAllCategories();
 
   const page = pageParam ? parseInt(pageParam, 10) : 1;
   const postsPerPage = 9;
-  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const totalPages = Math.ceil(newposts.length / postsPerPage);
 
-  const paginatedPosts = posts.slice(
+  const paginatedPosts = newposts.slice(
     (page - 1) * postsPerPage,
     page * postsPerPage
   );

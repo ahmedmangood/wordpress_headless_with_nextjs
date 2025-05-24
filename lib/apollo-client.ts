@@ -1,6 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 
-const url = process.env.WORDPRESS_UR;
+const url = process.env.WORDPRESS_URL;
 let client: any;
 
 /**

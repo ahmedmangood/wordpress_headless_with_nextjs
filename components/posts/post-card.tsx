@@ -11,7 +11,7 @@ import {
 } from "@/lib/wordpress";
 
 export default async function PostCard({ post }: { post: Post }) {
-  const media = await getFeaturedMediaById(post.featured_media);
+  const media = await getFeaturedMediaById(post.featuredImage);
   const author = await getAuthorById(post.author);
   const date = new Date(post.date).toLocaleDateString("en-US", {
     month: "long",
@@ -19,7 +19,7 @@ export default async function PostCard({ post }: { post: Post }) {
     year: "numeric",
   });
   const category = await getCategoryById(post.categories[0]);
-
+  const img = post.featuredImage.node;
   return (
     <Link
       href={`/posts/${post.slug}`}
@@ -32,24 +32,21 @@ export default async function PostCard({ post }: { post: Post }) {
         <div className="h-48 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
           <Image
             className="h-full w-full object-cover"
-            src={media.source_url || "/placeholder-transparent.png"}
+            src={img.sourceUrl || "/placeholder-transparent.png"}
             alt={post.title.rendered}
             width={400}
             height={200}
           />
         </div>
+        <div>{post.title.rendered}</div>
         <div
-          dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+          dangerouslySetInnerHTML={{ __html: post.title }}
           className="text-xl text-primary font-medium group-hover:underline decoration-muted-foreground underline-offset-4 decoration-dotted transition-all"
         ></div>
         <div
           className="text-sm"
-          dangerouslySetInnerHTML={{
-            __html:
-              post.excerpt.rendered.split(" ").slice(0, 12).join(" ").trim() +
-              "...",
-          }}
-        ></div>
+          dangerouslySetInnerHTML={{ __html: post.excerpt }}
+        />
       </div>
 
       <div className="flex flex-col gap-4">
