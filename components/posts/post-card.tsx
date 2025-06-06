@@ -19,7 +19,7 @@ export default async function PostCard({ post }: { post: Post }) {
     year: "numeric",
   });
   const category = await getCategoryById(post.categories[0]);
-  const img = post.featuredImage.node;
+  const img = post?.featuredImage?.node;
   return (
     <Link
       href={`/posts/${post.slug}`}
@@ -32,7 +32,7 @@ export default async function PostCard({ post }: { post: Post }) {
         <div className="h-48 w-full overflow-hidden relative rounded-md border flex items-center justify-center">
           <Image
             className="h-full w-full object-cover"
-            src={img.sourceUrl || "/placeholder-transparent.png"}
+            src={img?.sourceUrl || "/placeholder-transparent.png"}
             alt={post.title.rendered}
             width={400}
             height={200}
@@ -45,7 +45,16 @@ export default async function PostCard({ post }: { post: Post }) {
         ></div>
         <div
           className="text-sm"
-          dangerouslySetInnerHTML={{ __html: post.excerpt }}
+          dangerouslySetInnerHTML={{
+            __html: post.excerpt
+              ? post.excerpt
+                  .toString()
+                  .split(" ")
+                  .slice(0, 12)
+                  .join(" ")
+                  .trim() + "..."
+              : "No excerpt available",
+          }}
         />
       </div>
 

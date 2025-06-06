@@ -1,41 +1,53 @@
-import {
-  getPostBySlug,
-  getFeaturedMediaById,
-  getAuthorById,
-  getCategoryById,
-} from "@/lib/wordpress";
-
 import { Section, Container, Article, Main } from "@/components/craft";
 import { Metadata } from "next";
 import { badgeVariants } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-
 import Link from "next/link";
 import Balancer from "react-wrap-balancer";
+import { GET_POST_BY_SLUG_FUNC } from "@/lib/wordpressQueries";
+import { notFound } from "next/navigation";
+import Image from "next/image";
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string; locale: string };
 }): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
+  try {
+    const post = await GET_POST_BY_SLUG_FUNC(params.slug, params.locale);
 
-  return {
-    title: post.title.rendered,
-    description: post.excerpt.rendered,
-  };
+    return {
+      title: post?.title || "Post Not Found",
+      description: post?.excerpt || "No description available",
+    };
+  } catch (error) {
+    console.error("Metadata Error:", error);
+    return {
+      title: "Post Not Found",
+      description: "The requested post could not be found.",
+    };
+  }
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug);
-  const featuredMedia = await getFeaturedMediaById(post.featured_media);
-  const author = await getAuthorById(post.author);
-  const date = new Date(post.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-  const category = await getCategoryById(post.categories[0]);
+export default async function Page({
+  params,
+}: {
+  params: { slug: string; locale: string };
+}) {
+  let post;
+  try {
+    post = await GET_POST_BY_SLUG_FUNC(params.slug, params.locale);
+  } catch (error) {
+    notFound(); // Redirect to 404 page if post fetch fails
+  }
+
+  const date = post?.date
+    ? new Date(post.date).toLocaleDateString(params.locale, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Unknown Date";
 
   return (
     <Section>
@@ -43,36 +55,54 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <h1>
           <Balancer>
             <span
-              dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-            ></span>
+              dangerouslySetInnerHTML={{
+                __html: post?.title || "Untitled Post",
+              }}
+            />
           </Balancer>
         </h1>
 
         <div className="flex justify-between items-center gap-4 text-sm mb-4">
           <h5>
             Published {date} by{" "}
-            {author.name && (
+            {post?.author?.node?.name ? (
               <span>
-                <a href={`/posts/?author=${author.id}`}>{author.name}</a>{" "}
+                <Link href={`/posts/?author=${post.author.node.id}`}>
+                  {post.author.node.name}
+                </Link>
               </span>
+            ) : (
+              "Unknown Author"
             )}
           </h5>
-          <Link
-            href={`/posts/?category=${category.id}`}
-            className={cn(badgeVariants({ variant: "outline" }), "not-prose")}
-          >
-            {category.name}
-          </Link>
+          {post?.categories?.nodes?.[0]?.name && (
+            <Link
+              href={`/posts/?category=${post.categories.nodes[0].id}`}
+              className={cn(badgeVariants({ variant: "outline" }), "not-prose")}
+            >
+              {post.categories.nodes[0].name}
+            </Link>
+          )}
         </div>
         <div className="h-96 my-12 md:h-[560px] overflow-hidden flex items-center justify-center border rounded-lg bg-accent/25">
-          {/* eslint-disable-next-line */}
-          <img
+          <Image
             className="w-full"
-            src={featuredMedia.source_url || "/placeholder-transparent.png"}
-            alt={post.title.rendered}
+            src={
+              post?.featuredImage?.node?.sourceUrl ||
+              "/placeholder-transparent.png"
+            }
+            alt={
+              post?.featuredImage?.node?.altText || post?.title || "Post Image"
+            }
+            width={800}
+            height={600}
           />
         </div>
-        <Article dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+        <Article
+          dangerouslySetInnerHTML={{
+            __html: post?.content || "<p>No content available.</p>",
+          }}
+        />
       </Container>
     </Section>
   );

@@ -47,8 +47,11 @@ export async function getPostById(id: number): Promise<Post> {
   return post;
 }
 
-export async function getPostBySlug(slug: string): Promise<Post> {
-  const url = getUrl("/wp-json/wp/v2/posts", { slug });
+export async function getPostBySlug(
+  slug: string,
+  locale?: string
+): Promise<Post> {
+  const url = getUrl("/wp-json/wp/v2/posts", { slug, lang: locale });
   const response = await fetch(url);
   const post: Post[] = await response.json();
   return post[0];

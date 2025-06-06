@@ -18,8 +18,6 @@ import { Section, Container } from "@/components/craft";
 import PostCard from "@/components/posts/post-card";
 import FilterPosts from "./filter";
 import { GET_ALL_POSTS } from "@/lib/wordpressQueries";
-import { usePathname } from "@/i18n/navigation";
-import { getLocale } from "next-intl/server";
 
 export default async function Page({
   searchParams,

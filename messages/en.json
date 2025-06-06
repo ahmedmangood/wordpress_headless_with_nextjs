@@ -1,9 +1,18 @@
 {
   "LocaleSwitcher": {
-    "label": "En|English"
+    "label": "Change language",
+    "locale": "{locale, select, ar {🇸🇦 العربية} en {🇺🇸 English} other {Unknown}}"
+  },
+  "NavLinks": {
+    "home": "home",
+    "about": "about",
+    "services": "services",
+    "contact": "contact",
+    "blog": "blog",
+    "quote": "Get a quote"
   },
   "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+    "hero-title": "Start your project journey with us",
+    "hero-paragraph": "We offer comprehensive services in building design, finishing, low-current systems, and advanced technological solutions."
   }
 }

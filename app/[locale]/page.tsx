@@ -1,23 +1,11 @@
-// Craft Imports
-import { Section, Container, Main } from "@/components/craft";
-import Balancer from "react-wrap-balancer";
-
 // Components
 import HeroSection from "@/components/home/HeroSection";
 
-// Icons
-import { File, Pen, Tag, Boxes, User, Folder } from "lucide-react";
-import { useTranslations } from "next-intl";
-
 // This page is using the craft.tsx component and design system
 export default function Home() {
-  const t = useTranslations("HomePage");
   return (
     <main>
       <HeroSection />
-      <div className="mt-20 mb-20">
-        <h1 className="text-start">{t("title")}</h1>
-      </div>
     </main>
   );
 }
